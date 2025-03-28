@@ -1,6 +1,6 @@
 # Enhanced Pan-Tompkins Algorithm  
 
-This repository is part of the **HIE grading with HRV signals** project and provides an **enhanced version of the Pan-Tompkins algorithm**. The enhanced algorithm improves HRV signal extraction from ECG signals, ensuring higher quality and availability, even in noisy and artifact-prone conditions. More details can be seen in our paper: [paper]().
+This repository is part of the [HIE grading with HRV signals](https://github.com/syu-kylin/HRVConformer) project and provides an **enhanced version of the Pan-Tompkins algorithm**. The enhanced algorithm improves HRV signal extraction from ECG signals, ensuring higher quality and availability, even in noisy and artifact-prone conditions. More details can be seen in our paper: [paper]().
 
 ## Improvements Over the Standard Pan-Tompkins Algorithm  
 
