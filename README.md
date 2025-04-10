@@ -2,6 +2,15 @@
 
 This repository is part of the [HIE grading with HRV signals](https://github.com/syu-kylin/HRVConformer) project and provides an **enhanced version of the Pan-Tompkins algorithm**. The enhanced algorithm improves HRV signal extraction from ECG signals, ensuring higher quality and availability, even in noisy and artifact-prone conditions. More details can be seen in our paper: [paper]().
 
+```bibtex
+@article{your_paper_reference,
+  author    = {Your Name and Others},
+  title     = {Enhanced Pan-Tompkins Algorithm for HRV Extraction from Noisy ECG Signals},
+  journal   = {Journal Name},
+  year      = {2025}
+}
+```
+
 ## Improvements Over the Standard Pan-Tompkins Algorithm  
 
 A quantified comparison between the standard and enhanced versions of the Pan-Tompkins algorithm is shown in the table below. Using the **ANSeR dataset**, which includes **216 hours** (ANSeR1) and **259 hours** (ANSeR2) of ECG recordings, we evaluated HRV data availability after extraction, noise removal, and epoch generation.  
@@ -73,7 +82,11 @@ To use this enhanced Pan-Tompkins algorithm, follow these steps:
     ```
 
 3. **Run the algorithm on sample ECG data:**
-   
+   ```
+   python rr_extraction.py --edf_fn "your edf file path and name" --chann_name "selected ECG channel"
+   ```
+   - **edf_fn**: (str) the edf file path including file name.
+   - **chann_name**: (str or list) The selected could be a string for single channel or list of two string like ["ECG1", "ECG2"], ["X1", "X2"] for bipolar monatge. 
 ---
 
 ## Cite

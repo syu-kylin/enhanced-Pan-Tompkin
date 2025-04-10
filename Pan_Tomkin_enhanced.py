@@ -40,7 +40,7 @@ def ECG_reverse_check(bandpass, sfreq):
 
     return reverse_flag
     
-def Pan_Tompkin_preprocessing(ANSeR_num, file_id, chann_name, dataset):
+def Pan_Tompkin_preprocessing(edf_path, chann_name):
     """ This function is preprocessing part of Pan-Tompkin. It includes
     channel transformation (bi-polar if need), polarity check, bandpass, 
     derivative, and moving intergration.
@@ -63,29 +63,28 @@ def Pan_Tompkin_preprocessing(ANSeR_num, file_id, chann_name, dataset):
         *reverse_flag: (bool) the ecg signal is reversed or not.
     """
     # a). Read edf file pick ECG channel
-    home_dir = '/mnt/files'
-    if dataset == 'ANSeR':
-        fn = '%s/Datasets/One_Hour-Epochs_Raw_Data/ANSeR%s/%s.edf' %(home_dir, ANSeR_num, file_id)
-
     try:
-        raw = read_raw_edf(fn, preload=True, stim_channel='auto', verbose=False)
+        raw = read_raw_edf(edf_path, preload=True, stim_channel='auto', verbose=False)
     except:
         raise Exception('No such a file!')
 
     sfreq = int(raw.info['sfreq'])
     if sfreq > 256:
-        logger.info(f'{file_id} original sampling frequency: {sfreq}')
+        logger.info(f'raw file original sampling frequency: {sfreq}, will be downsampled to 256Hz.')
         filtraw_downsampled = raw.copy().resample(sfreq=256)
         sfreq = 256
+    else:
+        logger.info(f'raw file original sampling frequency: {sfreq}, no downsampling.')
+        filtraw_downsampled = raw.copy()
 
     # Get raw ECG data
     if isinstance(chann_name, list):
-        raw_bip =  mne.set_bipolar_reference(raw, anode=chann_name[0], cathode=chann_name[1], verbose=False)
+        raw_bip =  mne.set_bipolar_reference(filtraw_downsampled, anode=chann_name[0], cathode=chann_name[1], verbose=False)
         channel_name = f'{chann_name[0]}-{chann_name[1]}'
         raw_ECG = raw_bip.pick(channel_name)
         
     elif isinstance(chann_name, str):
-        raw_ECG = raw.pick(chann_name)
+        raw_ECG = filtraw_downsampled.pick(chann_name)
         channel_name = chann_name
         
     data_and_time = raw_ECG[channel_name, :]
@@ -102,9 +101,9 @@ def Pan_Tompkin_preprocessing(ANSeR_num, file_id, chann_name, dataset):
         ecg_arr = -ecg_arr  # reverse ECG
         if isinstance(chann_name, list):
             channel_name = f'{chann_name[1]}-{chann_name[0]}'
-        logger.info(f'{file_id} {channel_name} channel has been \033[1mreversed!\033[0m')
+        logger.info(f'signal {channel_name} channel has been \033[1mreversed!\033[0m')
         
-    logger.info(f'{file_id} {channel_name} channel is being processed!')
+    logger.info(f'signal {channel_name} channel is being processed!')
 
     # c). Derivated ECG
     derivatived = np.gradient(b_pass)
