@@ -1,4 +1,5 @@
 .vscode/** 
 rr_extraction_ANSeR.py
+rr_extraction.py
 output/** 
 **/__pycache__/**
