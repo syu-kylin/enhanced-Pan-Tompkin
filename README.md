@@ -1,6 +1,6 @@
 # Enhanced Pan-Tompkins Algorithm  
 
-This repository is part of the [HIE grading with HRV signals](https://github.com/syu-kylin/HRVConformer) project and provides an **enhanced version of the Pan-Tompkins algorithm**. The enhanced algorithm improves HRV signal extraction from ECG signals, ensuring higher quality and availability, even in noisy and artifact-prone conditions. More details can be seen in our paper: [paper]().
+This repository is part of the [HIE classification with HRV signals](https://github.com/syu-kylin/HRVConformer) project and provides an **enhanced version of the Pan-Tompkins algorithm**. The enhanced algorithm improves HRV signal extraction from ECG signals, ensuring higher quality and availability, even in noisy and artifact-prone conditions. More details can be seen in our paper: [paper]().
 
 ```bibtex
 @article{your_paper_reference,
@@ -15,17 +15,34 @@ This repository is part of the [HIE grading with HRV signals](https://github.com
 
 A quantified comparison between the standard and enhanced versions of the Pan-Tompkins algorithm is shown in the table below. Using the **ANSeR dataset**, which includes **216 hours** (ANSeR1) and **259 hours** (ANSeR2) of ECG recordings, we evaluated HRV data availability after extraction, noise removal, and epoch generation.  
 
-The **standard Pan-Tompkins algorithm** produced only **126 hours (5756 epochs)** and **161 hours (7207 epochs)** of usable HRV data. In contrast, our **enhanced Pan-Tompkins algorithm** preserved nearly all the original data, discarding only **1 hour** and **8 hours** of recordings, demonstrating its effectiveness in maintaining HRV data availability. 
+The **standard Pan-Tompkins algorithm** produced only **126 hours (5756 samples)** and **161 hours (7207 samples)** of usable HRV data. In contrast, our **enhanced Pan-Tompkins algorithm** preserved nearly all the original data, discarding only **1 hour** and **2 hours** of recordings, demonstrating its effectiveness in maintaining HRV data availability. 
 
 ### HRV Data Availability Comparison  
 
 | Algorithm Version     | ANSeR1 (216h)        | ANSeR2 (259h)        |
 |----------------------|--------------------|--------------------|
 | **Total ECG Data**   | 216h               | 259h               |
-| **Standard Pan-Tompkins**  | 126h (5756 epochs)   | 161h (7207 epochs)   |
-| **Enhanced Pan-Tompkins**  | 215h (11,208 epochs) | 251h (13,067 epochs) |
+| **Standard Pan-Tompkins**  | 126h (5756 samples)   | 161h (7207 samples)   |
+| **Enhanced Pan-Tompkins**  | 215h (11,208 samples) | 257h (13,067 samples) |
 
 ---
+### Improvements comparison
+#### Different frequency bands
+![alt text](<figures/bandpass different frequency band comparison.png>)
+
+#### Polarity check
+![alt text](<figures/bandpass ECG signa before and after poarity reversel.png>)
+
+#### Threshold reset
+![alt text](<figures/bandpass threshold reset comparison.png>)
+
+#### Bandpass signal searchback
+![alt text](<figures/ECG and bandpass signal searchbacl comparison.png>)
+
+#### artifact correction of insert peaks
+![alt text](<figures/bandpass insert peaks example.png>)
+
+--- 
 
 ### Examples of Extracted RR Intervals  
 
