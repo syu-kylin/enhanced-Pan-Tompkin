@@ -242,41 +242,52 @@ class QRS_detect():
         '''
         Update RR1, RR2, and related rr intervals limit.
         '''
-        # Take the most recent 8 peaks as RR_Average_1
-        self.RR1 = np.diff(self.FM_peaks[max(0,index-8):index + 1]) / self.samp_freq
 
         # Take the most recent detected RR interval and average
         signal_peaks = np.sort(self.signal_peaks)
         n_peaks_detected = len(signal_peaks)
-        if n_peaks_detected > 2:
-            self.R_invals = np.diff(signal_peaks[max(0,n_peaks_detected-8):])/self.samp_freq
-            self.detected_R_mean = np.mean(self.R_invals)
+        if n_peaks_detected >= 2:
+            # self.R_invals = np.diff(signal_peaks[max(0,n_peaks_detected-8):])/self.samp_freq
+            rr_all = np.diff(signal_peaks)/self.samp_freq
+            self.RR1 = rr_all[max(0, n_peaks_detected-8):]
+            self.RR_Average1 =  np.mean(self.RR1)
+            self.detected_R_mean = self.RR_Average1
+        else:
+            # Initialisation only: use candidate fiducial marks as a temporary proxy
+            rr_porxy = np.diff(self.FM_peaks[max(0,index-8):index + 1]) / self.samp_freq
+
+            if len(rr_porxy) >= 2:
+                self.RR1 = rr_porxy[-8:]
+                self.RR_Average1 = np.mean(self.RR1)
+            else:
+                # fallback default, e.g. 0.5 second
+                self.RR1 = [0.5]
+                self.RR_Average1 = 0.5
             
-        # Update RR Average 1&2
-        self.RR_Average1 =  np.mean(self.RR1)
-        RR_Average2 = self.RR_Average1
-          
-        if (index >= 8):
-            # calculate RR limits and RR_Average2
-            for RR in self.RR1:
-                if RR > self.RR_LOW_LIMIT and RR < self.RR_HIGH_LIMIT:                              
-                    self.RR2.append(RR)
-                    if (len(self.RR2) == 9):
-                        self.RR2.pop(0)     
-                        RR_Average2 = np.mean(self.RR2)
+        # Update RR Average 2
+        for current_rr in self.RR1:
+            if (current_rr > self.RR_LOW_LIMIT and current_rr < self.RR_HIGH_LIMIT):
+                self.RR2.append(current_rr)
+                if (len(self.RR2) > 8):
+                    self.RR2.pop(0)  
+
+        if len(self.RR2) > 0:   
+            RR_Average2 = np.mean(self.RR2)
+        else:
+            self.RR2 = self.RR1
+            RR_Average2 = self.RR_Average1
                         
         # set the RR limits
-        if (len(self.RR2) == 8 or index < 8):
-            self.RR_LOW_LIMIT = 0.92 * RR_Average2        
-            self.RR_HIGH_LIMIT = 1.16 * RR_Average2
-            self.RR_MISSED_LIMIT = 1.66 * RR_Average2
-            
+        self.RR_LOW_LIMIT = 0.92 * RR_Average2        
+        self.RR_HIGH_LIMIT = 1.16 * RR_Average2
+        self.RR_MISSED_LIMIT = 1.66 * RR_Average2
+        
         self.RR_Avg_1_lst.append(self.RR_Average1)
         self.RR_Avg_2_lst.append(RR_Average2)
         self.detected_R_Avg.append(self.detected_R_mean)
         
         # Decrease the thresholds to half, if irregular beats detected
-        if self.RR_Average1 < self.RR_LOW_LIMIT or self.RR_Average1 > self.RR_MISSED_LIMIT: 
+        if self.RR_Average1 < self.RR_LOW_LIMIT or self.RR_Average1 > self.RR_HIGH_LIMIT: 
             self.THRESHOLDI1 = self.THRESHOLDI1/2
             self.THRESHOLDF1 = self.THRESHOLDF1/2
 
@@ -475,11 +486,11 @@ class QRS_detect():
         self.rr_intervals_corrected = []
         for i, rr in enumerate(rr_intervals):
             # for rr that might experience small artifact lost one or two beats
-            if 2.05*rr_mean < rr <= 2 or rr < 0.2:
+            if 2.05*rr_mean < rr <= 2 or rr <= 0.2:
                 self.rr_intervals_corrected.append(rr_ma[i]) 
 
             # for rr that experienced large artifacts
-            elif 2 < rr < 10:
+            elif 2 < rr <= 10:
                 # Setup a window with a length of (current rr interval-0.5s).
                 # Take the possible peaks on bandpassed signal in this window 
                 # as the interpolated peaks.               
